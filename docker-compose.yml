@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # 1. Motor de Base de Datos MySQL
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # 2. Tu Backend de Node.js
+  backend:
+    build:
+      context: ./spotify-nodejs
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=${PORT}
+      - MONGO_URI=${MONGO_URI}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - SQL_HOST=${SQL_HOST}
+      - SQL_USER=${SQL_USER}
+      - SQL_PASSWORD=${SQL_PASSWORD}
+      - SQL_DATABASE=${SQL_DATABASE}
+      - SQL_PORT=${SQL_PORT}
+    depends_on:
+      - mysql
+
+  # 3. Tu Frontend de Angular
+  frontend:
+    build:
+      context: ./spotify-angular
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+# Persistencia de datos para que no se borre tu MySQL al apagar Docker
+volumes:
+  mysql_data:
