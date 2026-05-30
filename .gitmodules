@@ -1,0 +1,6 @@
+[submodule "spotify-nodejs"]
+	path = spotify-nodejs
+	url = https://github.com/sebastianarrue/spotify-nodejs
+[submodule "spotify-angular"]
+	path = spotify-angular
+	url = https://github.com/sebastianarrue/spotify-angular
