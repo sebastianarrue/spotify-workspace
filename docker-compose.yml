@@ -19,8 +19,11 @@ services:
       context: ./spotify-nodejs
     ports:
       - "3000:3000"
+    volumes:
+      - backend_images:/app/public/images
     environment:
       - PORT=${PORT}
+      - SESSION_SECRET=${SESSION_SECRET}
       - MONGO_URI=${MONGO_URI}
       - SENDGRID_API_KEY=${SENDGRID_API_KEY}
       - SQL_HOST=${SQL_HOST}
@@ -39,7 +42,10 @@ services:
       - "8080:80"
     depends_on:
       - backend
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
 
-# Persistencia de datos para que no se borre tu MySQL al apagar Docker
+# Persistencia de datos para que no se borre tu MySQL ni las imagenes al apagar Docker
 volumes:
   mysql_data:
+  backend_images:
