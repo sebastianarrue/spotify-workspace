@@ -29,6 +29,9 @@ jobs:
       with:
         node-version: 18 
         cache: 'npm'
+        cache-dependency-path: |
+          spotify-nodejs/package-lock.json
+          spotify-angular/package-lock.json
 
     - name: Correr Tests del Backend (Node.js)
       run: |
