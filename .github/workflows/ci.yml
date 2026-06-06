@@ -16,6 +16,8 @@ jobs:
     # Paso 1: Descargar el código del repositorio en la máquina virtual
     - name: Checkout del código
       uses: actions/checkout@v4
+      with:
+        submodules: recursive
 
     # Paso 2: Configurar Docker Compose en el entorno virtual
     - name: Verificar herramientas de Docker
