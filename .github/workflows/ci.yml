@@ -1,0 +1,29 @@
+name: Spotify Workspace CI
+
+# 1. ¿Cuándo se va a ejecutar? Cuando ocurra un push a la rama main
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # 2. Definimos el trabajo de validación
+  build-and-test:
+    runs-on: ubuntu-latest # Usará la última versión de Linux Ubuntu en GitHub
+
+    steps:
+    # Paso 1: Descargar el código del repositorio en la máquina virtual
+    - name: Checkout del código
+      uses: actions/checkout@v4
+
+    # Paso 2: Configurar Docker Compose en el entorno virtual
+    - name: Verificar herramientas de Docker
+      run: |
+        docker --version
+        docker compose version
+
+    # Paso 3: Construir las imágenes usando tu docker-compose.yml
+    # Esto probará que tanto el Dockerfile de Angular como el de Node compilan sin errores.
+    - name: Construir imágenes de Docker
+      run: docker compose build
