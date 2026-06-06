@@ -1,4 +1,3 @@
-```
 # Spotify Workspace
 
 A containerized, multi-repository architecture simulating a Spotify clone ecosystem. This repository serves as the parent workspace orchestrating decoupled services managed via Git Submodules, featuring automated distributed CI/CD workflows.
@@ -80,5 +79,3 @@ This workspace implements an advanced **Event-Driven Continuous Integration** pi
 2.  **Workspace Validation:** The parent workflow automatically catches the signal, updates its submodule pointers to the latest commits, and spins up a Linux runner.
 3.  **Shift-Left Testing:** Installs Node.js v22, provisions dependency caching to minimize runtime overhead, and executes isolated unit tests via **Jest** for both frontend and backend.
 4.  **Infrastructure Compilation:** If tests pass successfully, the runner validates the multi-container configuration by executing `docker compose build`.
-
-```
