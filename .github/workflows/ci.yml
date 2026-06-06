@@ -10,22 +10,37 @@ on:
     types: [ submodule-updated ]
 
 jobs:
-  # 2. Definimos el trabajo de validación
   build-and-test:
-    runs-on: ubuntu-latest # Usará la última versión de Linux Ubuntu en GitHub
+    runs-on: ubuntu-latest
 
     steps:
-    # Paso 1: Descargar el código del repositorio en la máquina virtual
     - name: Checkout del código
       uses: actions/checkout@v4
       with:
         submodules: recursive
         fetch-depth: 0
 
-    # Forzar actualización de punteros de submódulos por si acaso
     - name: Actualizar submódulos al último commit
       run: |
         git submodule update --remote --recursive
+
+    - name: Configurar Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18 
+        cache: 'npm
+
+    - name: Correr Tests del Backend (Node.js)
+      run: |
+        cd spotify-nodejs
+        npm ci 
+        npm test -- --passWithNoTests
+
+    - name: Correr Tests del Frontend (Angular)
+      run: |
+        cd spotify-angular
+        npm ci
+        npm test -- --watch=false
 
     # Paso 2: Configurar Docker Compose en el entorno virtual
     - name: Verificar herramientas de Docker
