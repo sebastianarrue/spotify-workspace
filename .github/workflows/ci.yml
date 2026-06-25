@@ -118,3 +118,50 @@ jobs:
         tags: |
           ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/spotify-frontend:latest
           ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/spotify-frontend:${{ github.sha }}
+
+  # ==========================================================
+  # JOB 3: DESPLIEGUE CONTINUO FRONTEND(CD) - Subida a AWS S3
+  # ==========================================================
+  deploy-frontend:
+    name: Continuous Deployment Frontend to S3
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.event_name == 'push' || github.event_name == 'repository_dispatch'
+
+    steps:
+    - name: Checkout del código
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 0
+
+    - name: Actualizar submódulos al último commit
+      run: git submodule update --remote --recursive
+
+    - name: Configurar Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: 'npm'
+        cache-dependency-path: spotify-angular/package-lock.json
+
+    # Compilar Angular para producción (Genera la carpeta dist/)
+    - name: Build Angular Project
+      run: |
+        cd spotify-angular
+        npm ci
+        npm run build -- --configuration=production
+
+    # Autenticación segura con AWS vía OIDC
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+        aws-region: ${{ vars.AWS_REGION }}
+        audience: sts.amazonaws.com
+
+    # Sincronizar la carpeta dist directamente a S3 borrando lo viejo
+    # NOTA: Ajusta 'dist/spotify-angular/browser' según la estructura que genere tu comando npm run build
+    - name: Deploy static files to S3
+      run: |
+        aws s3 sync ./spotify-angular/dist/spotify-angular/browser s3://sebastian-spotify-frontend --delete
